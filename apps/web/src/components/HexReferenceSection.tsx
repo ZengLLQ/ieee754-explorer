@@ -101,7 +101,7 @@ export const HexReferenceSection: React.FC<HexReferenceSectionProps> = ({ report
 
           <div className="overflow-x-auto">
             <table
-              className="w-full text-left border-collapse text-sm font-mono"
+              className="w-full text-left border-collapse text-sm sm:text-base font-mono"
               aria-label="4-bit binary to hexadecimal reference table"
             >
               <thead>
@@ -125,48 +125,56 @@ export const HexReferenceSection: React.FC<HexReferenceSectionProps> = ({ report
                   const rightActive = rightItem ? activeHexDigits.has(rightItem.hex) : false;
 
                   return (
-                    <tr key={`ref-row-${leftItem.hex}`}>
-                      <td
-                        className={`py-2 px-3 text-center font-bold border-r border-[#181C14]/10 ${
-                          leftActive
-                            ? 'bg-[#697565] text-[#ECDFCC]'
-                            : 'text-[#181C14]'
-                        }`}
-                      >
-                        {leftItem.hex}
+                    <tr
+                      key={`ref-row-${leftItem.hex}`}
+                      className={`transition-colors ${
+                        idx % 2 === 1 ? 'bg-[#181C14]/[0.04]' : 'bg-transparent'
+                      } hover:bg-[#181C14]/[0.08]`}
+                    >
+                      <td className="py-2 px-3 text-center border-r border-[#181C14]/10">
+                        {leftActive ? (
+                          <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#181C14] text-[#ECDFCC] font-bold text-sm sm:text-base shadow-xs">
+                            {leftItem.hex}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 text-[#3C3D37] font-semibold text-sm sm:text-base">
+                            {leftItem.hex}
+                          </span>
+                        )}
                       </td>
-                      <td
-                        className={`py-2 px-3 text-center border-r border-[#181C14]/25 ${
-                          leftActive
-                            ? 'bg-[#697565]/25 text-[#181C14] font-bold'
-                            : 'text-[#3C3D37]'
-                        }`}
-                      >
-                        {leftItem.binary}
+                      <td className="py-2 px-3 text-center border-r border-[#181C14]/20">
+                        <span className={leftActive ? 'font-bold text-[#181C14]' : 'text-[#3C3D37]/80'}>
+                          {leftItem.binary}
+                        </span>
                       </td>
-                      <td
-                        className={`py-2 px-3 text-center font-bold border-r border-[#181C14]/10 ${
-                          rightActive
-                            ? 'bg-[#697565] text-[#ECDFCC]'
-                            : 'text-[#181C14]'
-                        }`}
-                      >
-                        {rightItem?.hex}
+                      <td className="py-2 px-3 text-center border-r border-[#181C14]/10">
+                        {rightActive ? (
+                          <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#181C14] text-[#ECDFCC] font-bold text-sm sm:text-base shadow-xs">
+                            {rightItem?.hex}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 text-[#3C3D37] font-semibold text-sm sm:text-base">
+                            {rightItem?.hex}
+                          </span>
+                        )}
                       </td>
-                      <td
-                        className={`py-2 px-3 text-center ${
-                          rightActive
-                            ? 'bg-[#697565]/25 text-[#181C14] font-bold'
-                            : 'text-[#3C3D37]'
-                        }`}
-                      >
-                        {rightItem?.binary}
+                      <td className="py-2 px-3 text-center">
+                        <span className={rightActive ? 'font-bold text-[#181C14]' : 'text-[#3C3D37]/80'}>
+                          {rightItem?.binary}
+                        </span>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+          </div>
+
+          <div className="px-4 py-3 bg-[#3C3D37]/5 border-t border-[#181C14]/10 flex items-center gap-2.5 text-xs sm:text-sm font-sans text-[#3C3D37]">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-[#181C14] text-[#ECDFCC] font-mono font-bold text-[11px] shrink-0 shadow-2xs">
+              #
+            </span>
+            <span>Badge kontras menandai digit heksadesimal yang aktif pada hasil konversi. Baris tabel ditata selang-seling (zebra stripe) agar mudah dibaca.</span>
           </div>
         </div>
       </div>

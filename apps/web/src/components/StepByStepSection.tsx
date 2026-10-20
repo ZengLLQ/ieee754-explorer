@@ -214,7 +214,13 @@ export const StepByStepSection: React.FC<StepByStepSectionProps> = ({ report }) 
                         return (
                           <tr
                             key={`int-div-${row.step}`}
-                            className={isLast ? 'bg-[#697565]/20 font-bold' : ''}
+                            className={
+                              isLast
+                                ? 'bg-[#697565]/20 font-bold'
+                                : idx % 2 === 1
+                                ? 'bg-[#181C14]/[0.035]'
+                                : 'bg-transparent'
+                            }
                           >
                             <td className="py-2 px-3.5 text-[#181C14]">{row.expression}</td>
                             <td className="py-2 px-3.5 text-right text-[#3C3D37] font-semibold">{row.quotient}</td>
@@ -292,10 +298,16 @@ export const StepByStepSection: React.FC<StepByStepSectionProps> = ({ report }) 
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#181C14]/10">
-                      {step3_fraction.rows.map((row) => (
+                      {step3_fraction.rows.map((row, idx) => (
                         <tr
                           key={`frac-mul-${row.step}`}
-                          className={row.note ? 'bg-[#697565]/20 font-semibold' : ''}
+                          className={
+                            row.note
+                              ? 'bg-[#697565]/20 font-semibold'
+                              : idx % 2 === 1
+                              ? 'bg-[#181C14]/[0.035]'
+                              : 'bg-transparent'
+                          }
                         >
                           <td className="py-2 px-3 text-[#3C3D37]">{row.step}</td>
                           <td className="py-2 px-3 text-[#181C14]">{row.expression}</td>
@@ -464,8 +476,11 @@ export const StepByStepSection: React.FC<StepByStepSectionProps> = ({ report }) 
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#181C14]/10">
-                    {step5_biased_exponent.division_rows.map((row) => (
-                      <tr key={`exp-div-${row.step}`}>
+                    {step5_biased_exponent.division_rows.map((row, idx) => (
+                      <tr
+                        key={`exp-div-${row.step}`}
+                        className={idx % 2 === 1 ? 'bg-[#181C14]/[0.035]' : 'bg-transparent'}
+                      >
                         <td className="py-2 px-3.5 text-[#3C3D37]">{row.step}</td>
                         <td className="py-2 px-3.5 text-[#181C14]">{row.expression}</td>
                         <td className="py-2 px-3.5 text-right text-[#3C3D37]">{row.quotient}</td>
@@ -602,8 +617,11 @@ export const StepByStepSection: React.FC<StepByStepSectionProps> = ({ report }) 
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#181C14]/10">
-                    {step8_hex_rows.map((row) => (
-                      <tr key={`hex-nibble-${row.group_index}`}>
+                    {step8_hex_rows.map((row, idx) => (
+                      <tr
+                        key={`hex-nibble-${row.group_index}`}
+                        className={idx % 2 === 1 ? 'bg-[#181C14]/[0.035]' : 'bg-transparent'}
+                      >
                         <td className="py-2 px-3.5 text-[#3C3D37]">#{row.group_index}</td>
                         <td className="py-2 px-3.5 text-[#3C3D37]">{row.bit_range}</td>
                         <td className="py-2 px-3.5 font-bold text-[#181C14]">{row.binary_group}</td>
