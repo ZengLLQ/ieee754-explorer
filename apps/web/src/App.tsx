@@ -2,14 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   AlertCircle,
   ArrowRight,
-  Cpu,
   RotateCcw,
   Sparkles,
   X,
 } from 'lucide-react';
 import {
   convertDecimalViaRust,
-  detectRuntimeMode,
   fetchEngineMetadata,
   validateDecimalViaRust,
 } from './bridge/engineBridge';
@@ -90,17 +88,13 @@ export const App: React.FC = () => {
   const [validationError, setValidationError] = useState<InputValidation | null>(null);
   const [liveValidation, setLiveValidation] = useState<InputValidation | null>(null);
   const [presets, setPresets] = useState<ExamplePreset[]>(DEFAULT_PRESETS);
-  const [engineReady, setEngineReady] = useState<boolean>(false);
   const [engineError, setEngineError] = useState<string | null>(null);
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
-
-  const runtimeMode = detectRuntimeMode();
 
   const executeConversion = useCallback(
     async (targetInput: string, targetPrecision: Precision) => {
       try {
         const res = await convertDecimalViaRust(targetInput, targetPrecision);
-        setEngineReady(true);
         setEngineError(null);
         if (res.ok) {
           setReport(res.data);
@@ -114,7 +108,7 @@ export const App: React.FC = () => {
         setEngineError(
           err instanceof Error
             ? err.message
-            : 'Failed to initialize the Rust WebAssembly conversion engine.',
+            : 'Failed to initialize the IEEE 754 conversion engine.',
         );
       }
     },
@@ -213,25 +207,21 @@ export const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#ECDFCC] text-[#181C14]">
       {/* 1. Minimal Top Navigation */}
       <header className="sticky top-0 z-30 bg-[#ECDFCC]/95 backdrop-blur-sm border-b border-[#181C14]/15">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded bg-[#181C14] text-[#ECDFCC] font-mono text-xs font-bold flex items-center justify-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-8 h-8 rounded bg-[#181C14] text-[#ECDFCC] font-mono text-sm font-bold flex items-center justify-center shadow-xs">
               754
             </div>
-            <span className="font-bold tracking-tight text-sm sm:text-base text-[#181C14]">
+            <span className="font-bold tracking-tight text-base sm:text-lg text-[#181C14]">
               IEEE 754 Explorer
             </span>
-            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-[#3C3D37] text-[#ECDFCC]">
-              <Cpu className="w-3 h-3 text-[#697565]" />
-              {runtimeMode === 'tauri-native'
-                ? 'Rust Native Core (Tauri 2)'
-                : engineReady
-                  ? 'Rust WebAssembly Core'
-                  : 'Initializing Rust Core'}
+            <span className="hidden md:inline-flex items-center gap-2 text-xs font-mono px-3 py-1 rounded-full bg-[#3C3D37] text-[#ECDFCC] border border-[#ECDFCC]/15">
+              <span className="w-2 h-2 rounded-full bg-[#697565]" />
+              IEEE Std 754-2019
             </span>
           </div>
 
-          <nav aria-label="Section navigation" className="hidden sm:flex items-center gap-5 text-xs font-medium text-[#3C3D37]">
+          <nav aria-label="Section navigation" className="hidden sm:flex items-center gap-6 text-sm font-medium text-[#3C3D37]">
             <a href="#format-overview" className="hover:text-[#181C14] transition-colors">
               Format Overview
             </a>
@@ -255,17 +245,17 @@ export const App: React.FC = () => {
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* 2 & 3. Hero Section + Decimal Input + Precision Selector */}
         <section className="py-8 sm:py-12" aria-labelledby="hero-heading">
-          <div className="max-w-3xl mb-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#697565] mb-2">
+          <div className="max-w-3xl mb-8">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[#697565] mb-2.5">
               Digital Systems & Computer Architecture Laboratory
             </p>
             <h1
               id="hero-heading"
-              className="text-3xl sm:text-5xl font-bold tracking-tight text-[#181C14] leading-[1.1]"
+              className="text-3xl sm:text-5xl font-bold tracking-tight text-[#181C14] leading-[1.15]"
             >
               IEEE 754 Floating-Point Conversion, Bit by Bit.
             </h1>
-            <p className="mt-3 text-sm sm:text-base text-[#3C3D37] leading-relaxed">
+            <p className="mt-3.5 text-base sm:text-lg text-[#3C3D37] leading-relaxed">
               Enter any decimal number — positive, negative, fractional, signed zero, or scientific
               notation — to inspect the exact mathematical steps, normalization shift, biased
               exponent, IEEE 754 rounding, and hexadecimal encoding.
@@ -273,21 +263,21 @@ export const App: React.FC = () => {
           </div>
 
           {/* Primary Input & Precision Control Surface */}
-          <div className="rounded-xl bg-[#181C14] text-[#ECDFCC] p-4 sm:p-6 border border-[#3C3D37]">
+          <div className="rounded-xl bg-[#181C14] text-[#ECDFCC] p-5 sm:p-7 border border-[#3C3D37] shadow-sm">
             {/* Precision Segmented Control */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-[#ECDFCC]/15">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-5 border-b border-[#ECDFCC]/15">
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-[#697565] block">
+                <span className="text-xs font-mono uppercase tracking-wider text-[#697565] font-semibold block mb-0.5">
                   Select Target Floating-Point Precision
                 </span>
-                <span className="text-xs text-[#ECDFCC]/80">
-                  Switching modes updates all 9 steps, bit fields, bias, and hexadecimal output
+                <span className="text-sm text-[#ECDFCC]/85">
+                  Switching modes updates all 9 derivation steps, bit fields, bias, and hexadecimal output
                   immediately.
                 </span>
               </div>
 
               <div
-                className="inline-grid grid-cols-2 p-1 rounded-lg bg-[#3C3D37] border border-[#ECDFCC]/15 self-start sm:self-auto"
+                className="inline-grid grid-cols-2 p-1.5 rounded-lg bg-[#3C3D37] border border-[#ECDFCC]/15 self-start sm:self-auto shrink-0 gap-1"
                 role="radiogroup"
                 aria-label="Floating-point precision selector"
               >
@@ -296,14 +286,14 @@ export const App: React.FC = () => {
                   role="radio"
                   aria-checked={precision === 'single'}
                   onClick={() => handlePrecisionSwitch('single')}
-                  className={`px-3.5 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-4 py-2.5 rounded-md text-sm font-semibold transition-all cursor-pointer ${
                     precision === 'single'
                       ? 'bg-[#ECDFCC] text-[#181C14] shadow-xs'
                       : 'text-[#ECDFCC]/80 hover:text-[#ECDFCC]'
                   }`}
                 >
-                  <span className="block font-bold">Single Precision</span>
-                  <span className="font-mono text-[10px] opacity-80">
+                  <span className="block font-bold text-sm sm:text-base">Single Precision</span>
+                  <span className="font-mono text-xs opacity-80 block mt-0.5">
                     binary32 • 32-bit (Bias 127)
                   </span>
                 </button>
@@ -313,14 +303,14 @@ export const App: React.FC = () => {
                   role="radio"
                   aria-checked={precision === 'double'}
                   onClick={() => handlePrecisionSwitch('double')}
-                  className={`px-3.5 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-4 py-2.5 rounded-md text-sm font-semibold transition-all cursor-pointer ${
                     precision === 'double'
                       ? 'bg-[#ECDFCC] text-[#181C14] shadow-xs'
                       : 'text-[#ECDFCC]/80 hover:text-[#ECDFCC]'
                   }`}
                 >
-                  <span className="block font-bold">Double Precision</span>
-                  <span className="font-mono text-[10px] opacity-80">
+                  <span className="block font-bold text-sm sm:text-base">Double Precision</span>
+                  <span className="font-mono text-xs opacity-80 block mt-0.5">
                     binary64 • 64-bit (Bias 1023)
                   </span>
                 </button>
@@ -331,13 +321,13 @@ export const App: React.FC = () => {
             <form onSubmit={handleFormSubmit} noValidate>
               <label
                 htmlFor="decimal-input"
-                className="block text-xs font-semibold uppercase tracking-wider text-[#ECDFCC]/80 mb-2"
+                className="block text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#ECDFCC]/85 mb-2.5"
               >
                 Decimal Number Input (Standard, Fractional, Signed -0, or Scientific Notation e.g.
                 1.25e-10)
               </label>
 
-              <div className="flex flex-col sm:flex-row gap-2.5">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <div
                   className={`relative flex-1 flex items-center rounded-lg bg-[#ECDFCC] text-[#181C14] border-2 transition-all ${
                     validationError || (liveValidation && !liveValidation.is_valid)
@@ -360,7 +350,7 @@ export const App: React.FC = () => {
                       !!validationError || (liveValidation ? !liveValidation.is_valid : false)
                     }
                     aria-describedby="input-validation-feedback"
-                    className="w-full px-4 py-3 pr-10 bg-transparent text-[#181C14] placeholder-[#3C3D37]/60 font-mono text-base sm:text-lg font-semibold focus:outline-none"
+                    className="w-full px-4.5 py-3.5 pr-11 bg-transparent text-[#181C14] placeholder-[#3C3D37]/60 font-mono text-base sm:text-xl font-semibold focus:outline-none"
                   />
                   {inputValue.length > 0 && (
                     <button
@@ -368,7 +358,7 @@ export const App: React.FC = () => {
                       onClick={handleClearInput}
                       aria-label="Clear decimal input"
                       title="Clear input"
-                      className="absolute right-2.5 p-1.5 rounded-md text-[#3C3D37] hover:text-[#181C14] hover:bg-[#181C14]/10 transition-colors cursor-pointer"
+                      className="absolute right-3 p-1.5 rounded-md text-[#3C3D37] hover:text-[#181C14] hover:bg-[#181C14]/10 transition-colors cursor-pointer"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -377,7 +367,7 @@ export const App: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#697565] hover:bg-[#7A8775] text-[#ECDFCC] font-semibold text-sm transition-colors cursor-pointer shrink-0"
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-lg bg-[#697565] hover:bg-[#7A8775] text-[#ECDFCC] font-semibold text-sm sm:text-base transition-colors cursor-pointer shrink-0 shadow-xs"
                 >
                   <span>Convert to IEEE 754</span>
                   <ArrowRight className="w-4 h-4" />
@@ -385,7 +375,7 @@ export const App: React.FC = () => {
               </div>
 
               {/* Validation & Precision Feedback */}
-              <div id="input-validation-feedback" className="mt-2.5 min-h-[22px] text-xs">
+              <div id="input-validation-feedback" className="mt-3 min-h-[24px] text-sm">
                 {engineError ? (
                   <div className="flex items-center gap-2 text-amber-300">
                     <AlertCircle className="w-4 h-4 shrink-0" />
@@ -393,7 +383,7 @@ export const App: React.FC = () => {
                   </div>
                 ) : validationError?.error_message ||
                   (liveValidation && !liveValidation.is_valid && liveValidation.error_message) ? (
-                  <div className="flex items-center justify-between gap-2 text-amber-200 bg-[#3C3D37] px-3 py-2 rounded-md border border-amber-400/40">
+                  <div className="flex items-center justify-between gap-3 text-amber-200 bg-[#3C3D37] px-3.5 py-2.5 rounded-md border border-amber-400/40">
                     <div className="flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0 text-amber-300" />
                       <span>
@@ -403,25 +393,25 @@ export const App: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handlePresetClick(DEFAULT_PRESETS[0])}
-                      className="inline-flex items-center gap-1 font-mono underline text-[#ECDFCC] shrink-0 cursor-pointer"
+                      className="inline-flex items-center gap-1 font-mono underline text-[#ECDFCC] shrink-0 cursor-pointer text-xs"
                     >
-                      <RotateCcw className="w-3 h-3" />
+                      <RotateCcw className="w-3.5 h-3.5" />
                       Restore 126.25
                     </button>
                   </div>
                 ) : liveValidation?.warning_message ? (
-                  <div className="text-[#ECDFCC]/85 bg-[#3C3D37]/80 px-3 py-1.5 rounded">
-                    Note: {liveValidation.warning_message}
+                  <div className="text-[#ECDFCC]/90 bg-[#3C3D37]/80 px-3.5 py-2 rounded">
+                    Catatan: {liveValidation.warning_message}
                   </div>
                 ) : (
-                  <div className="flex flex-wrap items-center justify-between gap-2 text-[#ECDFCC]/70">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[#ECDFCC]/75">
                     <span>
-                      Press <kbd className="px-1.5 py-0.5 rounded bg-[#3C3D37] font-mono text-[11px]">Enter</kbd>{' '}
-                      or click <strong className="text-[#ECDFCC]">Convert to IEEE 754</strong>.
-                      Original decimal string is preserved without premature rounding.
+                      Tekan <kbd className="px-1.5 py-0.5 rounded bg-[#3C3D37] font-mono text-xs">Enter</kbd>{' '}
+                      atau klik <strong className="text-[#ECDFCC]">Convert to IEEE 754</strong>.
+                      String desimal asli dipertahankan secara utuh tanpa pembulatan prematur.
                     </span>
                     {liveValidation?.preserves_negative_zero && (
-                      <span className="font-mono text-[#ECDFCC] bg-[#697565] px-2 py-0.5 rounded text-[11px]">
+                      <span className="font-mono text-[#ECDFCC] bg-[#697565] px-2.5 py-0.5 rounded text-xs font-bold">
                         Negative Zero (-0) Sign Preserved
                       </span>
                     )}
@@ -431,12 +421,12 @@ export const App: React.FC = () => {
             </form>
 
             {/* Clickable Example Presets */}
-            <div className="mt-4 pt-4 border-t border-[#ECDFCC]/15">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#ECDFCC]/70 mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#697565]" />
-                <span>Curated Educational Test Cases (Click to Populate & Convert)</span>
+            <div className="mt-5 pt-5 border-t border-[#ECDFCC]/15">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#ECDFCC]/75 mb-2.5">
+                <Sparkles className="w-4 h-4 text-[#697565]" />
+                <span>Contoh Nilai Uji Edukatif (Klik untuk Memuat & Mengonversi):</span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {presets.map((preset) => {
                   const isActive =
                     report?.original_input === preset.input &&
@@ -447,9 +437,9 @@ export const App: React.FC = () => {
                       type="button"
                       onClick={() => handlePresetClick(preset)}
                       title={preset.description}
-                      className={`px-2.5 py-1.5 rounded-md font-mono text-xs transition-all cursor-pointer border ${
+                      className={`px-3 py-1.5 rounded-md font-mono text-xs sm:text-sm transition-all cursor-pointer border ${
                         isActive
-                          ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] font-bold'
+                          ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] font-bold shadow-xs'
                           : 'bg-[#3C3D37]/70 text-[#ECDFCC] border-[#ECDFCC]/15 hover:bg-[#3C3D37] hover:border-[#ECDFCC]/40'
                       }`}
                     >
@@ -464,47 +454,47 @@ export const App: React.FC = () => {
           {/* Immediate Above-the-Fold Result Summary Banner */}
           {report && (
             <div
-              className="mt-4 rounded-xl bg-[#3C3D37] text-[#ECDFCC] p-4 sm:p-5 border border-[#181C14]/30 transition-all duration-200"
+              className="mt-5 rounded-xl bg-[#3C3D37] text-[#ECDFCC] p-5 sm:p-6 border border-[#181C14]/30 transition-all duration-200 shadow-sm"
               aria-live="polite"
             >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-[#697565] text-[#ECDFCC] font-bold">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span className="text-xs font-mono uppercase tracking-wider px-2.5 py-1 rounded bg-[#697565] text-[#ECDFCC] font-bold">
                       {report.format.standard_name}
                     </span>
-                    <span className="text-xs text-[#ECDFCC]/80 font-medium">
+                    <span className="text-sm text-[#ECDFCC]/90 font-medium">
                       {report.step9_interpretation.category_label}
                     </span>
-                    <span className="text-xs font-mono text-[#ECDFCC]/70">
+                    <span className="text-sm font-mono text-[#ECDFCC]/75">
                       • Input: {report.original_input}₁₀
                     </span>
                   </div>
 
-                  <div className="font-mono text-xs sm:text-sm break-all pt-1">
-                    <span className="text-[#ECDFCC]/70 mr-1.5">Bits:</span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#ECDFCC] text-[#181C14] font-bold mr-1">
+                  <div className="font-mono text-sm sm:text-base break-all pt-1 flex flex-wrap items-center gap-1.5">
+                    <span className="text-[#ECDFCC]/75 mr-1 font-sans text-sm">Bit Pola:</span>
+                    <span className="px-2 py-0.5 rounded bg-[#ECDFCC] text-[#181C14] font-bold" title="Sign Bit">
                       {report.sign_bit_str}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#697565] text-[#ECDFCC] font-bold mr-1">
+                    <span className="px-2 py-0.5 rounded bg-[#697565] text-[#ECDFCC] font-bold" title="Exponent Bits">
                       {report.exponent_bits}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#181C14] text-[#ECDFCC]">
+                    <span className="px-2 py-0.5 rounded bg-[#181C14] text-[#ECDFCC] font-bold" title="Fraction Bits">
                       {report.fraction_bits}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 shrink-0">
-                  <div className="px-3.5 py-2 rounded-lg bg-[#181C14] border border-[#ECDFCC]/15">
-                    <span className="text-[10px] font-mono uppercase text-[#ECDFCC]/65 block">
+                <div className="flex flex-wrap items-center gap-3.5 shrink-0">
+                  <div className="px-4 py-2.5 rounded-lg bg-[#181C14] border border-[#ECDFCC]/15">
+                    <span className="text-xs font-mono uppercase text-[#ECDFCC]/70 block font-semibold">
                       Hexadecimal
                     </span>
-                    <span className="font-mono text-lg sm:text-xl font-bold text-[#ECDFCC]">
+                    <span className="font-mono text-xl sm:text-2xl font-bold text-[#ECDFCC]">
                       {report.hexadecimal}
                     </span>
                   </div>
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-2">
                     <CopyButton value={report.hexadecimal} label="Copy Hex" variant="light" />
                     <CopyButton
                       value={report.complete_bit_pattern}
@@ -540,17 +530,17 @@ export const App: React.FC = () => {
       </main>
 
       {/* 9. Minimal Footer */}
-      <footer className="mt-12 border-t border-[#181C14]/15 bg-[#181C14] text-[#ECDFCC]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#ECDFCC]/75">
-          <div className="flex items-center gap-2.5">
-            <span className="w-5 h-5 rounded bg-[#697565] text-[#ECDFCC] font-mono text-[10px] font-bold flex items-center justify-center">
+      <footer className="mt-16 border-t border-[#181C14]/15 bg-[#181C14] text-[#ECDFCC]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#ECDFCC]/85">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 rounded bg-[#697565] text-[#ECDFCC] font-mono text-xs font-bold flex items-center justify-center">
               754
             </span>
-            <span className="font-semibold text-[#ECDFCC]">IEEE 754 Explorer</span>
-            <span>— Centralized Rust Numerical Core (`ieee754-core`) + WebAssembly & Tauri 2</span>
+            <span className="font-bold text-[#ECDFCC]">IEEE 754 Explorer</span>
+            <span className="text-[#ECDFCC]/75">— Interactive Floating-Point Conversion & Visual Step-by-Step Analysis</span>
           </div>
-          <div className="font-mono text-[11px] text-[#ECDFCC]/65">
-            IEEE Std 754-2019 Compliant • Round-to-Nearest, Ties-to-Even
+          <div className="font-mono text-xs sm:text-sm text-[#ECDFCC]/75">
+            IEEE Std 754-2019 Specification • Single (binary32) & Double (binary64) Precision
           </div>
         </div>
       </footer>

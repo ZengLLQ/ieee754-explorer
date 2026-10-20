@@ -1380,19 +1380,27 @@ fn build_nine_steps(
 ) -> Vec<ConversionStep> {
     let raw_in = &parsed.validation.trimmed_input;
 
+    let polarity_eval = if parsed.validation.preserves_negative_zero {
+        "x = -0 (Signed Negative Zero)  ⟹  Sign = 1"
+    } else if sign_bit == 1 {
+        "x < 0 (Negative Value)  ⟹  Sign = 1"
+    } else {
+        "x ≥ +0 (Positive / Non-Negative Value)  ⟹  Sign = 0"
+    };
+
     vec![
         ConversionStep {
             step_number: 1,
             title: "Input Analysis".to_string(),
-            subtitle: format!("{} ({}) Layout & Parameters", format.name, format.standard_name),
+            subtitle: format!("{} ({}) Bit-Field Layout & Parameters", format.name, format.standard_name),
             concise_explanation: format!(
-                "Analyze the input decimal value ({raw_in}) and configure the bit-field layout for {} ({} total bits: {} Sign, {} Exponent, {} Fraction, Bias = {}).",
-                format.name, format.total_bits, format.sign_bits, format.exponent_bits, format.fraction_bits, format.bias
+                "• Input Decimal: {raw_in}\n• Target Format: {} ({} total bits)\n• Bit Allocation: {} Sign bit, {} Exponent bits, {} Fraction bits\n• Format Bias: Bias = {}",
+                format.standard_name, format.total_bits, format.sign_bits, format.exponent_bits, format.fraction_bits, format.bias
             ),
-            formula: "Total Bits = Sign (1) + Exponent (k) + Fraction (p),  Bias = 2^(k - 1) - 1".to_string(),
+            formula: "• Total Bits (N) = Sign (1) + Exponent (k) + Fraction (p)\n• Exponent Bias   = 2^(k - 1) - 1".to_string(),
             populated_formula: format!(
-                "{} bits = 1 + {} + {},  Bias = 2^({} - 1) - 1 = {}",
-                format.total_bits, format.exponent_bits, format.fraction_bits, format.exponent_bits, format.bias
+                "• Target Format:   {} ({})\n• Bit Allocation:  {} bits = 1 (Sign) + {} (Exponent) + {} (Fraction)\n• Format Bias:      Bias = 2^({} - 1) - 1 = {}",
+                format.name, format.standard_name, format.total_bits, format.exponent_bits, format.fraction_bits, format.exponent_bits, format.bias
             ),
             calculated_result: format!(
                 "{} — {} ({})",
@@ -1404,37 +1412,44 @@ fn build_nine_steps(
                 "Sign ({}b) | Exponent ({}b) | Fraction ({}b)",
                 format.sign_bits, format.exponent_bits, format.fraction_bits
             )),
-            next_step_connection: "With the target bit layout and exponent bias established, we first determine the 1-bit Sign field in Step 2.".to_string(),
+            next_step_connection: "The bit-field layout and bias are established. Next, Step 2 determines the 1-bit Sign field.".to_string(),
         },
         ConversionStep {
             step_number: 2,
             title: "Determine the Sign Bit".to_string(),
-            subtitle: "Bit 0 of the IEEE 754 Layout (Most Significant Bit)".to_string(),
+            subtitle: "Bit [MSB] — Algebraic Sign Evaluation".to_string(),
             concise_explanation: if parsed.validation.preserves_negative_zero {
-                "Negative zero (-0) explicitly carries a minus sign, so IEEE 754 sets the Sign bit to 1 while magnitude remains 0.".to_string()
+                "• Input is signed negative zero (-0) ⟹ Sign bit is set to 1.\n• Magnitude |x| = 0 is converted with zero exponent and zero fraction.".to_string()
             } else if sign_bit == 1 {
-                "Because the input value is negative (< 0), the IEEE 754 Sign bit is set to 1. The remaining steps convert the absolute magnitude |x|.".to_string()
+                format!(
+                    "• Input is negative ({raw_in} < 0) ⟹ Sign bit is set to 1.\n• Absolute magnitude |{raw_in}| is converted in following steps."
+                )
             } else {
-                "Because the input value is positive (≥ +0), the IEEE 754 Sign bit is set to 0.".to_string()
+                format!(
+                    "• Input is non-negative ({raw_in} ≥ +0) ⟹ Sign bit is set to 0.\n• Positive magnitude is converted in following steps."
+                )
             },
-            formula: "Sign = 0 if x ≥ +0,  Sign = 1 if x < 0 (or x is -0)".to_string(),
-            populated_formula: format!("{raw_in} → Sign = {sign_bit}"),
-            calculated_result: format!("Sign = {sign_bit}"),
+            formula: "Sign = { 0,  if x ≥ +0\n       { 1,  if x < 0  or  x = -0".to_string(),
+            populated_formula: format!(
+                "• Input Value: x = {raw_in}\n• Condition:   {polarity_eval}\n• Stored Bit:  Sign = {sign_bit} (Bit {})",
+                format.total_bits - 1
+            ),
+            calculated_result: format!("Sign = {sign_bit} (Bit {})", format.total_bits - 1),
             binary_visualization: Some(sign_bit.to_string()),
-            next_step_connection: "The Sign bit is stored as the most significant bit (MSB). Next, Step 3 converts the unsigned magnitude |x| from base 10 into base 2.".to_string(),
+            next_step_connection: "The sign is isolated in the MSB. Step 3 converts the unsigned magnitude |x| into binary.".to_string(),
         },
         ConversionStep {
             step_number: 3,
             title: "Convert Decimal to Binary".to_string(),
             subtitle: "Separate Integer Division by 2 & Fractional Multiplication by 2".to_string(),
             concise_explanation: format!(
-                "{} {}",
-                step3_int.explanation, step3_frac.explanation
+                "• Integer Part:  {}₁₀ = {}₂ (repeated division by 2, read ↑ bottom-to-top)\n• Fraction Part: {}₁₀ = .{}₂ (repeated multiplication by 2, read ↓ top-to-bottom)",
+                step3_int.decimal_integer, step3_int.binary_string, step3_frac.decimal_fraction, step3_frac.binary_string
             ),
-            formula: "Integer: N ÷ 2 → (Quotient, Remainder ↑)   |   Fraction: f × 2 → (Integer Bit ↓, Remaining Fraction)".to_string(),
+            formula: "• Integer Part:   N ÷ 2  ⟹  Remainders read bottom-to-top (↑)\n• Fraction Part:  f × 2  ⟹  Integer bits read top-to-bottom (↓)".to_string(),
             populated_formula: format!(
-                "|{raw_in}|₁₀ = {}₁₀ + {}₁₀ → {}.{}₂",
-                step3_int.decimal_integer, step3_frac.decimal_fraction, step3_int.binary_string, step3_frac.binary_string
+                "• Integer:   {}₁₀ = {}₂\n• Fraction:  {}₁₀ = .{}₂\n• Combined:  |{}|₁₀ = {}.{}₂",
+                step3_int.decimal_integer, step3_frac.decimal_fraction, step3_int.binary_string, step3_frac.binary_string, raw_in, step3_int.binary_string, step3_frac.binary_string
             ),
             calculated_result: format!(
                 "{}.{}₂",
@@ -1444,83 +1459,98 @@ fn build_nine_steps(
                 "{}.{}",
                 step3_int.binary_string, step3_frac.binary_string
             )),
-            next_step_connection: "This combined fixed-point binary value is normalized into scientific binary form (1.xxxxx₂ × 2^e) in Step 4.".to_string(),
+            next_step_connection: "This fixed-point binary value is normalized into scientific floating-point form in Step 4.".to_string(),
         },
         ConversionStep {
             step_number: 4,
             title: "Normalize the Binary Number".to_string(),
-            subtitle: "Shift the Binary Point to Form 1.xxxxx₂ × 2^e".to_string(),
-            concise_explanation: step4.explanation.clone(),
-            formula: "|x|₂ = 1.xxxxx₂ × 2^e   (Normal)   |   0.xxxxx₂ × 2^(1 - Bias)   (Subnormal)".to_string(),
+            subtitle: "Shift Binary Point to Form: 1.f₂ × 2^e".to_string(),
+            concise_explanation: format!(
+                "• Unnormalized Binary: {}₂\n• Normalized Scientific Form: {}\n• Implicit Leading Bit: '{}' (omitted from memory for normal numbers)\n• Unbiased Exponent: e = {}",
+                step4.unnormalized_binary, step4.normalized_expression, step4.implicit_leading_bit, step4.unbiased_exponent
+            ),
+            formula: "• Normal Form:    |x|₂ = 1.f₂ × 2^e       (1 ≤ 1.f₂ < 2,  e = unbiased exponent)\n• Subnormal Form: |x|₂ = 0.f₂ × 2^(1 - Bias)  (implicit leading bit = 0)".to_string(),
             populated_formula: format!(
-                "{}₂ = {}",
-                step4.unnormalized_binary, step4.normalized_expression
+                "• Before Shift: {}₂\n• Normalized:   {}\n• Exponent e:   {} (shift: {} position(s) {})\n• Leading Bit:  '{}' (hidden bit)",
+                step4.unnormalized_binary, step4.normalized_expression, step4.unbiased_exponent, step4.shift_amount, step4.shift_direction, step4.implicit_leading_bit
             ),
             calculated_result: format!(
-                "Unbiased Exponent (e) = {}, Significand = {}₂",
+                "e = {}, Significand = {}₂",
                 step4.unbiased_exponent, step4.normalized_significand
             ),
             binary_visualization: Some(step4.normalized_expression.clone()),
             next_step_connection: format!(
-                "The unbiased exponent e = {} is passed to Step 5 to compute the unsigned {}-bit Biased Exponent field, while the fractional bits after the binary point go to Step 6.",
-                step4.unbiased_exponent, format.exponent_bits
+                "Unbiased exponent e = {} is passed to Step 5 to compute the Biased Exponent field, while bits after the binary point proceed to Step 6.",
+                step4.unbiased_exponent
             ),
         },
         ConversionStep {
             step_number: 5,
             title: "Calculate the Biased Exponent".to_string(),
-            subtitle: format!("Add {} Bias ({}) and Encode in {} Bits", format.name, format.bias, format.exponent_bits),
-            concise_explanation: step5.explanation.clone(),
-            formula: format!(
-                "{}   ({})",
-                step5.biased_exponent_formula, step5.bias_derivation_formula
+            subtitle: format!("Add Bias ({}) to Unbiased Exponent (e = {})", format.bias, step4.unbiased_exponent),
+            concise_explanation: format!(
+                "• Formula: Biased Exponent (E) = e + Bias\n• Calculation: {} + {} = {}₁₀\n• Convert {}₁₀ to {}-bit binary ⟹ {}₂ (read ↑ bottom-to-top)",
+                step4.unbiased_exponent, format.bias, step5.biased_exponent_decimal, step5.biased_exponent_decimal, format.exponent_bits, step5.biased_exponent_binary
             ),
-            populated_formula: step5.populated_formula.clone(),
+            formula: "• Biased Exponent (E) = e + Bias\n• Bias Constant       = 2^(k - 1) - 1   (k = exponent bits)".to_string(),
+            populated_formula: format!(
+                "• Format Bias:    2^({} - 1) - 1 = {}\n• Decimal Exponent: E = {} + {} = {}₁₀\n• Binary Field:   {}₁₀ = {}₂ ({} bits)",
+                format.exponent_bits, format.bias, step4.unbiased_exponent, format.bias, step5.biased_exponent_decimal, step5.biased_exponent_decimal, step5.biased_exponent_binary, format.exponent_bits
+            ),
             calculated_result: format!(
-                "{}₁₀ = {}₂ ({} bits)",
+                "E = {}₁₀ = {}₂ ({} bits)",
                 step5.biased_exponent_decimal, step5.biased_exponent_binary, format.exponent_bits
             ),
             binary_visualization: Some(exponent_bits.to_string()),
             next_step_connection: format!(
-                "The {}-bit biased exponent {}₂ is ready for assembly in Step 7. Next, Step 6 determines the {}-bit Fraction field.",
+                "The {}-bit biased exponent {}₂ is ready. Step 6 extracts and rounds the {}-bit Fraction field.",
                 format.exponent_bits, exponent_bits, format.fraction_bits
             ),
         },
         ConversionStep {
             step_number: 6,
             title: "Determine the Fraction Field".to_string(),
-            subtitle: format!("Extract & Round to Exactly {} Bits", format.fraction_bits),
-            concise_explanation: step6.explanation.clone(),
-            formula: format!(
-                "Significand = {}.Fraction  →  Store {} bits after binary point (Round to Nearest, Ties to Even)",
-                step6.hidden_leading_bit, format.fraction_bits
+            subtitle: format!("Extract Significand & Format to Exactly {} Bits", format.fraction_bits),
+            concise_explanation: format!(
+                "• Normalized Significand: {}\n• Implicit Bit: '{}' (omitted)\n• Stored Fraction: {}₂ ({} bits)\n• Rounding Status: {}",
+                step6.significand_before_encoding, step6.hidden_leading_bit, step6.final_fraction_bits, format.fraction_bits,
+                if step6.rounding_occurred {
+                    format!("Rounded {} via IEEE 754 ties-to-even", step6.rounding_direction)
+                } else {
+                    format!("Exact representation ({} trailing zeros padded)", step6.padded_zeros_count)
+                }
             ),
+            formula: "• Significand:   1.f₂  ⟹  Fraction Field = f₂ (length = p bits)\n• Rounding Mode: IEEE 754 Round-to-Nearest, Ties-to-Even (Guard, Round, Sticky)".to_string(),
             populated_formula: format!(
-                "{}₂ → Fraction = {}₂ ({} bits)",
-                step6.significand_before_encoding, step6.final_fraction_bits, format.fraction_bits
+                "• Significand:   {}\n• Fraction Bits: {}₂ ({} bits)\n• Evaluation:    {}",
+                step6.significand_before_encoding, step6.final_fraction_bits, format.fraction_bits,
+                if step6.rounding_occurred {
+                    format!("Guard bit = {:?}, Round = {:?}, Sticky = {:?} ⟹ Rounded {}", step6.guard_bit, step6.round_bit, step6.sticky_bit, step6.rounding_direction)
+                } else {
+                    format!("Exact fraction ({} trailing zero bit(s) appended)", step6.padded_zeros_count)
+                }
             ),
-            calculated_result: format!("{}₂", step6.final_fraction_bits),
+            calculated_result: format!("Fraction = {}₂ ({} bits)", step6.final_fraction_bits, format.fraction_bits),
             binary_visualization: Some(fraction_bits.to_string()),
-            next_step_connection: "Now that Sign, Biased Exponent, and Fraction fields are all finalized, Step 7 assembles the complete IEEE 754 bit pattern.".to_string(),
+            next_step_connection: "Sign, Biased Exponent, and Fraction fields are finalized. Step 7 concatenates them into the IEEE 754 bit pattern.".to_string(),
         },
         ConversionStep {
             step_number: 7,
             title: "Assemble the IEEE 754 Bit Pattern".to_string(),
             subtitle: format!("Combine 1 + {} + {} = {} Bits", format.exponent_bits, format.fraction_bits, format.total_bits),
             concise_explanation: format!(
-                "Place the 1-bit Sign, {}-bit Biased Exponent, and {}-bit Fraction field side by side into a single {}-bit binary word.",
-                format.exponent_bits, format.fraction_bits, format.total_bits
+                "• Sign Bit (1b):         {}\n• Biased Exponent ({}b): {}\n• Fraction Field ({}b):  {}\n• Total Pattern ({}b):   {}",
+                sign_bit, format.exponent_bits, exponent_bits, format.fraction_bits, fraction_bits, format.total_bits, complete_bit_pattern
             ),
-            formula: "IEEE 754 Word = [ Sign | Biased Exponent | Fraction ]".to_string(),
+            formula: "• IEEE 754 Word = [ Sign ]₁ ∥ [ Biased Exponent ]ₖ ∥ [ Fraction ]ₚ\n• Total Length  = 1 + k + p bits".to_string(),
             populated_formula: format!(
-                "[ {sign_bit} | {exponent_bits} | {fraction_bits} ]  ({} = {} bits)",
-                format!("1 + {} + {}", format.exponent_bits, format.fraction_bits),
-                format.total_bits
+                "• Bit Assembly: [ {} ]₁ ∥ [ {} ]{} ∥ [ {} ]{}\n• Concatenated: {}₂ ({} bits)",
+                sign_bit, exponent_bits, format.exponent_bits, fraction_bits, format.fraction_bits, complete_bit_pattern, format.total_bits
             ),
             calculated_result: complete_bit_pattern.to_string(),
             binary_visualization: Some(format!("{sign_bit} {exponent_bits} {fraction_bits}")),
             next_step_connection: format!(
-                "In Step 8, this {}-bit binary pattern is partitioned into {} groups of 4 bits (nibbles) to produce the compact hexadecimal representation.",
+                "In Step 8, this {}-bit binary pattern is partitioned into {} four-bit nibbles to produce the hexadecimal representation.",
                 format.total_bits,
                 format.hex_digits
             ),
@@ -1530,15 +1560,19 @@ fn build_nine_steps(
             title: "Convert Binary to Hexadecimal".to_string(),
             subtitle: format!("Group {} Bits into {} Four-Bit Nibbles", format.total_bits, format.hex_digits),
             concise_explanation: format!(
-                "Partition the {}-bit pattern from MSB to LSB into {} groups of 4 bits and map each 4-bit group to its hexadecimal digit (0–F).",
+                "• Partition {}-bit word from MSB to LSB into {} four-bit nibbles.\n• Convert each 4-bit binary group (0000₂–1111₂) into a hex digit (0–9, A–F).\n• Encoded Hexadecimal: {hexadecimal}",
                 format.total_bits, format.hex_digits
             ),
-            formula: "Each 4-bit nibble (b₃b₂b₁b₀)₂ = (8·b₃ + 4·b₂ + 2·b₁ + b₀)₁₆".to_string(),
-            populated_formula: step8_hex
-                .iter()
-                .map(|r| format!("{}₂→{}", r.binary_group, r.hex_digit))
-                .collect::<Vec<_>>()
-                .join("  "),
+            formula: "• 4-Bit Nibble: (b₃ b₂ b₁ b₀)₂ = (b₃·2³ + b₂·2² + b₁·2¹ + b₀·2⁰)₁₀  ⟹  Hex Digit (0–F)".to_string(),
+            populated_formula: format!(
+                "• Nibble Mapping: {}\n• Hexadecimal:    {}",
+                step8_hex
+                    .iter()
+                    .map(|r| format!("{}₂→{}", r.binary_group, r.hex_digit))
+                    .collect::<Vec<_>>()
+                    .join("  "),
+                hexadecimal
+            ),
             calculated_result: hexadecimal.to_string(),
             binary_visualization: Some(
                 step8_hex
@@ -1547,21 +1581,29 @@ fn build_nine_steps(
                     .collect::<Vec<_>>()
                     .join(" "),
             ),
-            next_step_connection: "Step 9 summarizes the final encoding and evaluates the exact decimal value represented in memory alongside any rounding difference.".to_string(),
+            next_step_connection: "Step 9 verifies the representation accuracy and computes the exact decimal value stored in memory.".to_string(),
         },
         ConversionStep {
             step_number: 9,
             title: "Final Result and Interpretation".to_string(),
             subtitle: "Mathematical Verification & Representation Accuracy".to_string(),
-            concise_explanation: step9.accuracy_explanation.clone(),
-            formula: "Value = (-1)^Sign × (1 + Fraction · 2^(-p)) × 2^(Biased_Exp - Bias)".to_string(),
-            populated_formula: step9.reconstruction_formula.clone(),
+            concise_explanation: format!(
+                "• Input Decimal:   {raw_in}₁₀\n• Stored Decimal:  {}\n• Representation:  {}\n• Absolute Error:  {}",
+                step9.represented_decimal_exact,
+                if step9.is_exact_representation { "Exact (Zero error)" } else { "Rounded (nearest IEEE 754 float)" },
+                step9.approximation_error
+            ),
+            formula: "• Stored Value = (-1)^Sign × (1 + Fraction · 2^(-p)) × 2^(E - Bias)".to_string(),
+            populated_formula: format!(
+                "• Reconstruction: {}\n• Error Margin:   {}\n• Analysis:       {}",
+                step9.reconstruction_formula, step9.approximation_error, step9.accuracy_explanation
+            ),
             calculated_result: format!(
-                "{hexadecimal}  (Stored Decimal = {})",
+                "{hexadecimal} (Stored Decimal = {})",
                 step9.represented_decimal_exact
             ),
             binary_visualization: Some(complete_bit_pattern.to_string()),
-            next_step_connection: "Conversion complete. Try toggling between Single Precision (32-bit) and Double Precision (64-bit) above to compare how exponent bias and fraction precision change.".to_string(),
+            next_step_connection: "Conversion derivation complete. Toggle precision above (Single binary32 ↔ Double binary64) to compare format differences.".to_string(),
         },
     ]
 }

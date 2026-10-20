@@ -91,16 +91,16 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
     }
 
     return (
-      <div className="mt-3 pt-3 border-t border-[#ECDFCC]/15 flex flex-wrap items-center justify-between gap-2 text-xs text-[#ECDFCC]/90 font-mono">
+      <div className="mt-3.5 pt-3.5 border-t border-[#ECDFCC]/15 flex flex-wrap items-center justify-between gap-2.5 text-xs sm:text-sm text-[#ECDFCC]/95 font-mono">
         <span>
-          Selected Bit <strong className="text-[#ECDFCC]">#{selectedBitIndex}</strong>: {bitRole}
+          Bit Terpilih <strong className="text-[#ECDFCC] text-sm sm:text-base">#{selectedBitIndex}</strong>: {bitRole}
         </span>
         <button
           type="button"
           onClick={() => setSelectedBitIndex(null)}
-          className="text-[#ECDFCC]/70 hover:text-[#ECDFCC] underline cursor-pointer"
+          className="text-[#ECDFCC]/75 hover:text-[#ECDFCC] underline cursor-pointer text-xs"
         >
-          Clear bit selection
+          Hapus pilihan bit
         </button>
       </div>
     );
@@ -110,42 +110,42 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
     <section
       id="bit-visualization"
       aria-labelledby="bit-visualization-heading"
-      className="py-10 border-t border-[#181C14]/15"
+      className="py-12 border-t border-[#181C14]/15"
     >
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#697565] mb-1">
-            Interactive Bit-Level Register Map
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.16em] text-[#697565] mb-1.5">
+            Peta Register Interaktif Tingkat Bit
           </p>
           <h2
             id="bit-visualization-heading"
-            className="text-2xl sm:text-3xl font-bold tracking-tight text-[#181C14]"
+            className="text-2xl sm:text-4xl font-bold tracking-tight text-[#181C14]"
           >
-            IEEE 754 Bit-Pattern Visualization
+            Visualisasi Pola Bit IEEE 754
           </h2>
-          <p className="text-sm text-[#3C3D37] mt-1">
-            Select <span className="font-semibold text-[#181C14]">SIGN</span>,{' '}
-            <span className="font-semibold text-[#181C14]">EXPONENT</span>, or{' '}
-            <span className="font-semibold text-[#181C14]">FRACTION</span> — or click any individual
-            bit — to inspect how it contributes to the final encoding.
+          <p className="text-sm sm:text-base text-[#3C3D37] mt-1.5 leading-relaxed">
+            Pilih <span className="font-semibold text-[#181C14]">SIGN</span>,{' '}
+            <span className="font-semibold text-[#181C14]">EXPONENT</span>, atau{' '}
+            <span className="font-semibold text-[#181C14]">FRACTION</span> — atau klik salah satu sel bit
+            untuk melihat bobot pangkat dua dan kontribusinya pada representasi akhir.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <CopyButton
             value={report.complete_bit_pattern}
-            label={`Copy ${totalBits}-Bit Binary`}
+            label={`Salin Biner ${totalBits}-Bit`}
             variant="dark"
           />
-          <CopyButton value={report.hexadecimal} label={`Copy ${report.hexadecimal}`} variant="light" />
+          <CopyButton value={report.hexadecimal} label={`Salin ${report.hexadecimal}`} variant="light" />
         </div>
       </div>
 
       {/* Main Dark Architectural Register Surface */}
-      <div className="rounded-xl bg-[#181C14] text-[#ECDFCC] p-4 sm:p-6 border border-[#3C3D37] shadow-sm">
+      <div className="rounded-xl bg-[#181C14] text-[#ECDFCC] p-5 sm:p-7 border border-[#3C3D37] shadow-sm">
         {/* Interactive Field Selector Tabs: SIGN | EXPONENT | FRACTION */}
         <div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-6"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6"
           role="tablist"
           aria-label="IEEE 754 Bit Fields"
         >
@@ -155,23 +155,23 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
             role="tab"
             aria-selected={selectedField === 'SIGN'}
             onClick={() => setSelectedField('SIGN')}
-            className={`text-left p-3.5 rounded-lg border transition-all duration-150 cursor-pointer ${
+            className={`text-left p-4 rounded-xl border transition-all duration-150 cursor-pointer ${
               selectedField === 'SIGN'
-                ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] ring-2 ring-[#697565]'
+                ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] ring-2 ring-[#697565] shadow-xs'
                 : 'bg-[#3C3D37]/60 text-[#ECDFCC] border-[#ECDFCC]/20 hover:bg-[#3C3D37]'
             }`}
           >
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
               <span>[S] SIGN</span>
-              <span className="font-mono">{format.sign_bits} bit</span>
+              <span className="font-mono text-xs">{format.sign_bits} bit</span>
             </div>
-            <div className="mt-1.5 font-mono text-lg font-bold">{report.sign_bit_str}</div>
+            <div className="mt-2 font-mono text-xl font-bold">{report.sign_bit_str}</div>
             <div
-              className={`text-[11px] mt-0.5 ${
-                selectedField === 'SIGN' ? 'text-[#3C3D37]' : 'text-[#ECDFCC]/70'
+              className={`text-xs mt-1 ${
+                selectedField === 'SIGN' ? 'text-[#3C3D37]' : 'text-[#ECDFCC]/75'
               }`}
             >
-              Bit {totalBits - 1} • {report.sign_bit === 0 ? 'Positive (+)' : 'Negative (-)'}
+              Bit {totalBits - 1} • {report.sign_bit === 0 ? 'Positif (+)' : 'Negatif (-)'}
             </div>
           </button>
 
@@ -181,20 +181,20 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
             role="tab"
             aria-selected={selectedField === 'EXPONENT'}
             onClick={() => setSelectedField('EXPONENT')}
-            className={`text-left p-3.5 rounded-lg border transition-all duration-150 cursor-pointer ${
+            className={`text-left p-4 rounded-xl border transition-all duration-150 cursor-pointer ${
               selectedField === 'EXPONENT'
-                ? 'bg-[#697565] text-[#ECDFCC] border-[#ECDFCC] ring-2 ring-[#ECDFCC]/60'
+                ? 'bg-[#697565] text-[#ECDFCC] border-[#ECDFCC] ring-2 ring-[#ECDFCC]/60 shadow-xs'
                 : 'bg-[#697565]/35 text-[#ECDFCC] border-[#697565]/60 hover:bg-[#697565]/55'
             }`}
           >
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
               <span>[E] EXPONENT</span>
-              <span className="font-mono">{format.exponent_bits} bits</span>
+              <span className="font-mono text-xs">{format.exponent_bits} bit</span>
             </div>
-            <div className="mt-1.5 font-mono text-base sm:text-lg font-bold tracking-wider break-all">
+            <div className="mt-2 font-mono text-lg sm:text-xl font-bold tracking-wider break-all">
               {report.exponent_bits}
             </div>
-            <div className="text-[11px] mt-0.5 text-[#ECDFCC]/85">
+            <div className="text-xs mt-1 text-[#ECDFCC]/85">
               Bits {totalBits - 2}..{format.fraction_bits} • Biased ={' '}
               {report.step5_biased_exponent.biased_exponent_decimal}
             </div>
@@ -206,36 +206,36 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
             role="tab"
             aria-selected={selectedField === 'FRACTION'}
             onClick={() => setSelectedField('FRACTION')}
-            className={`text-left p-3.5 rounded-lg border transition-all duration-150 cursor-pointer ${
+            className={`text-left p-4 rounded-xl border transition-all duration-150 cursor-pointer ${
               selectedField === 'FRACTION'
-                ? 'bg-[#3C3D37] text-[#ECDFCC] border-[#ECDFCC] ring-2 ring-[#697565]'
+                ? 'bg-[#3C3D37] text-[#ECDFCC] border-[#ECDFCC] ring-2 ring-[#697565] shadow-xs'
                 : 'bg-[#3C3D37]/45 text-[#ECDFCC] border-[#ECDFCC]/20 hover:bg-[#3C3D37]/80'
             }`}
           >
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
               <span>[F] FRACTION</span>
-              <span className="font-mono">{format.fraction_bits} bits</span>
+              <span className="font-mono text-xs">{format.fraction_bits} bit</span>
             </div>
-            <div className="mt-1.5 font-mono text-xs sm:text-sm font-bold tracking-wider truncate">
+            <div className="mt-2 font-mono text-sm sm:text-base font-bold tracking-wider truncate">
               {report.fraction_bits}
             </div>
-            <div className="text-[11px] mt-0.5 text-[#ECDFCC]/75">
-              Bits {format.fraction_bits - 1}..0 • Significand after &apos;
+            <div className="text-xs mt-1 text-[#ECDFCC]/75">
+              Bits {format.fraction_bits - 1}..0 • Signifikand setelah &apos;
               {report.step4_normalization.implicit_leading_bit}.&apos;
             </div>
           </button>
         </div>
 
         {/* Individual Interactive Bit Cells (wraps cleanly with zero horizontal overflow) */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between text-[11px] text-[#ECDFCC]/70 mb-2 font-mono">
-            <span>Bit Index {totalBits - 1} (MSB)</span>
-            <span>Click any bit cell to inspect its weight</span>
-            <span>Bit Index 0 (LSB)</span>
+        <div className="mb-6">
+          <div className="flex items-center justify-between text-xs text-[#ECDFCC]/70 mb-2.5 font-mono">
+            <span>Bit #{totalBits - 1} (MSB)</span>
+            <span className="font-sans font-medium">Klik salah satu sel bit untuk melihat bobot pangkat 2</span>
+            <span>Bit #0 (LSB)</span>
           </div>
 
           <div
-            className="flex flex-wrap gap-1 items-center p-3 rounded-lg bg-[#3C3D37]/40 border border-[#ECDFCC]/15"
+            className="flex flex-wrap gap-1 items-center p-3.5 rounded-xl bg-[#3C3D37]/40 border border-[#ECDFCC]/15"
             role="group"
             aria-label={`Interactive ${totalBits}-bit register cells`}
           >
@@ -244,17 +244,17 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
               type="button"
               onClick={() => handleBitClick(0, 'SIGN')}
               title={`Bit ${totalBits - 1} (Sign): ${report.sign_bit_str}`}
-              className={`w-7 h-9 sm:w-8 sm:h-10 rounded flex flex-col items-center justify-center font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
+              className={`w-7 h-10 sm:w-9 sm:h-11 rounded-md flex flex-col items-center justify-center font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
                 selectedField === 'SIGN'
-                  ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] scale-105'
+                  ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] scale-105 shadow-xs'
                   : 'bg-[#ECDFCC]/85 text-[#181C14] border-[#ECDFCC]/50 hover:bg-[#ECDFCC]'
               }`}
             >
-              <span className="text-[8px] leading-none opacity-65">S</span>
+              <span className="text-[9px] leading-none opacity-65 font-bold">S</span>
               <span>{report.sign_bit_str}</span>
             </button>
 
-            <span className="text-[#ECDFCC]/40 font-mono px-0.5 select-none" aria-hidden="true">
+            <span className="text-[#ECDFCC]/40 font-mono px-1 select-none text-base" aria-hidden="true">
               |
             </span>
 
@@ -269,21 +269,21 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
                   type="button"
                   onClick={() => handleBitClick(msbOffset, 'EXPONENT')}
                   title={`Bit ${bitIndex} (Exponent): ${bit}`}
-                  className={`w-6 h-9 sm:w-7 sm:h-10 rounded flex flex-col items-center justify-center font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
+                  className={`w-6 h-10 sm:w-7 sm:h-11 rounded-md flex flex-col items-center justify-center font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer border ${
                     isBitSelected
-                      ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] scale-105'
+                      ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] scale-105 shadow-xs'
                       : selectedField === 'EXPONENT'
                         ? 'bg-[#697565] text-[#ECDFCC] border-[#ECDFCC]/60'
                         : 'bg-[#697565]/65 text-[#ECDFCC] border-[#697565] hover:bg-[#697565]'
                   }`}
                 >
-                  <span className="text-[8px] leading-none opacity-70">{bitIndex}</span>
+                  <span className="text-[8px] leading-none opacity-75">{bitIndex}</span>
                   <span>{bit}</span>
                 </button>
               );
             })}
 
-            <span className="text-[#ECDFCC]/40 font-mono px-0.5 select-none" aria-hidden="true">
+            <span className="text-[#ECDFCC]/40 font-mono px-1 select-none text-base" aria-hidden="true">
               |
             </span>
 
@@ -298,15 +298,15 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
                   type="button"
                   onClick={() => handleBitClick(msbOffset, 'FRACTION')}
                   title={`Bit ${bitIndex} (Fraction 2^-${i + 1}): ${bit}`}
-                  className={`w-6 h-9 sm:w-6 sm:h-10 rounded flex flex-col items-center justify-center font-mono text-xs font-semibold transition-all cursor-pointer border ${
+                  className={`w-6 h-10 sm:w-7 sm:h-11 rounded-md flex flex-col items-center justify-center font-mono text-xs sm:text-sm font-semibold transition-all cursor-pointer border ${
                     isBitSelected
-                      ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] scale-105'
+                      ? 'bg-[#ECDFCC] text-[#181C14] border-[#ECDFCC] scale-105 shadow-xs'
                       : selectedField === 'FRACTION'
                         ? 'bg-[#3C3D37] text-[#ECDFCC] border-[#ECDFCC]/50'
                         : 'bg-[#181C14] text-[#ECDFCC]/90 border-[#ECDFCC]/20 hover:bg-[#3C3D37]'
                   }`}
                 >
-                  <span className="text-[8px] leading-none opacity-60">{bitIndex}</span>
+                  <span className="text-[8px] leading-none opacity-65">{bitIndex}</span>
                   <span>{bit}</span>
                 </button>
               );
@@ -315,28 +315,28 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
         </div>
 
         {/* Complete Single-Line / Grouped Bit Pattern & Field Counts */}
-        <div className="p-3.5 rounded-lg bg-[#181C14] border border-[#ECDFCC]/15 mb-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[#ECDFCC]/75 mb-1.5">
+        <div className="p-4 rounded-xl bg-[#181C14] border border-[#ECDFCC]/15 mb-5 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-[#ECDFCC]/75 mb-2">
             <span>
-              Complete {totalBits}-Bit Pattern ({step7_assembly.addition_formula})
+              Pola Lengkap {totalBits}-Bit ({step7_assembly.addition_formula})
             </span>
-            <span className="font-mono text-[#ECDFCC]">Hex: {report.hexadecimal}</span>
+            <span className="font-mono text-[#ECDFCC] font-bold">Hex: {report.hexadecimal}</span>
           </div>
-          <div className="font-mono text-xs sm:text-sm md:text-base tracking-wider break-all leading-relaxed select-all">
+          <div className="font-mono text-sm sm:text-base md:text-lg tracking-wider break-all leading-relaxed select-all">
             <span
-              className="px-1.5 py-0.5 rounded bg-[#ECDFCC] text-[#181C14] font-bold mr-1"
+              className="px-2 py-0.5 rounded bg-[#ECDFCC] text-[#181C14] font-bold mr-1.5"
               title="Sign Bit"
             >
               {report.sign_bit_str}
             </span>
             <span
-              className="px-1.5 py-0.5 rounded bg-[#697565] text-[#ECDFCC] font-bold mr-1"
+              className="px-2 py-0.5 rounded bg-[#697565] text-[#ECDFCC] font-bold mr-1.5"
               title="Exponent Bits"
             >
               {report.exponent_bits}
             </span>
             <span
-              className="px-1.5 py-0.5 rounded bg-[#3C3D37] text-[#ECDFCC] font-semibold border border-[#ECDFCC]/20"
+              className="px-2 py-0.5 rounded bg-[#3C3D37] text-[#ECDFCC] font-semibold border border-[#ECDFCC]/20"
               title="Fraction Bits"
             >
               {report.fraction_bits}
@@ -346,38 +346,38 @@ export const BitVisualizationSection: React.FC<BitVisualizationSectionProps> = (
 
         {/* Selected Field Educational Explanation Panel */}
         <div
-          className="rounded-lg bg-[#3C3D37]/75 border border-[#ECDFCC]/20 p-4 transition-all duration-200"
+          className="rounded-xl bg-[#3C3D37]/75 border border-[#ECDFCC]/20 p-5 transition-all duration-200"
           role="tabpanel"
           aria-live="polite"
         >
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-[#697565] text-[#ECDFCC]">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-mono uppercase px-2.5 py-1 rounded bg-[#697565] text-[#ECDFCC] font-bold">
                 {activeInfo.badge}
               </span>
-              <h3 className="text-sm sm:text-base font-bold text-[#ECDFCC]">{activeInfo.title}</h3>
+              <h3 className="text-base sm:text-lg font-bold text-[#ECDFCC]">{activeInfo.title}</h3>
             </div>
-            <span className="text-xs font-mono text-[#ECDFCC]/80">{activeInfo.bitRange}</span>
+            <span className="text-xs sm:text-sm font-mono text-[#ECDFCC]/80">{activeInfo.bitRange}</span>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#ECDFCC]/90 leading-relaxed mb-3">
+          <p className="text-sm sm:text-base text-[#ECDFCC]/90 leading-relaxed mb-4">
             {activeInfo.purpose}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
-            <div className="p-2.5 rounded bg-[#181C14]/80 border border-[#ECDFCC]/10">
-              <span className="text-[#ECDFCC]/60 block text-[10px] uppercase">
-                Decoded Field Meaning
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-sm font-mono">
+            <div className="p-3.5 rounded-lg bg-[#181C14]/80 border border-[#ECDFCC]/10">
+              <span className="text-[#ECDFCC]/70 block text-xs uppercase font-semibold">
+                Arti Terurai Field
               </span>
-              <span className="text-[#ECDFCC] font-semibold mt-0.5 block break-all">
+              <span className="text-[#ECDFCC] font-semibold mt-1 block break-all">
                 {activeInfo.decodedSummary}
               </span>
             </div>
-            <div className="p-2.5 rounded bg-[#181C14]/80 border border-[#ECDFCC]/10">
-              <span className="text-[#ECDFCC]/60 block text-[10px] uppercase">
-                Mathematical Formula Contribution
+            <div className="p-3.5 rounded-lg bg-[#181C14]/80 border border-[#ECDFCC]/10">
+              <span className="text-[#ECDFCC]/70 block text-xs uppercase font-semibold">
+                Kontribusi Rumus Matematika
               </span>
-              <span className="text-[#ECDFCC] font-semibold mt-0.5 block break-all">
+              <span className="text-[#ECDFCC] font-semibold mt-1 block break-all">
                 {activeInfo.formulaNote}
               </span>
             </div>

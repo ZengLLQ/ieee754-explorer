@@ -36,7 +36,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   };
 
   const baseStyles =
-    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#697565] cursor-pointer select-none';
+    'inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#697565] cursor-pointer select-none shadow-xs';
 
   const variantStyles =
     variant === 'dark'

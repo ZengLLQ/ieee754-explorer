@@ -19,104 +19,103 @@ export const HexReferenceSection: React.FC<HexReferenceSectionProps> = ({ report
     <section
       id="hex-reference"
       aria-labelledby="hex-reference-heading"
-      className="py-10 border-t border-[#181C14]/15"
+      className="py-12 border-t border-[#181C14]/15"
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#697565] mb-1">
-            Nibble Grouping & Lookup Reference
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.16em] text-[#697565] mb-1.5">
+            Pengelompokan 4-Bit (Nibble) & Tabel Rujukan
           </p>
           <h2
             id="hex-reference-heading"
-            className="text-2xl sm:text-3xl font-bold tracking-tight text-[#181C14]"
+            className="text-2xl sm:text-4xl font-bold tracking-tight text-[#181C14]"
           >
-            Hexadecimal Conversion & 4-Bit Reference Table
+            Konversi Heksadesimal & Tabel Referensi 4-Bit
           </h2>
-          <p className="text-sm text-[#3C3D37] mt-1">
-            Each 4-bit binary group maps directly to one hexadecimal digit. Active digits used in{' '}
-            <code className="font-mono font-bold text-[#181C14]">{hexadecimal}</code> are
-            highlighted.
+          <p className="text-sm sm:text-base text-[#3C3D37] mt-1.5 leading-relaxed">
+            Setiap grup 4 bit biner dipetakan secara langsung ke satu digit heksadesimal. Digit aktif yang digunakan dalam{' '}
+            <code className="font-mono font-bold text-[#181C14] text-base">{hexadecimal}</code> ditandai dengan warna kontras.
           </p>
         </div>
 
-        <CopyButton value={hexadecimal} label={`Copy ${hexadecimal}`} variant="dark" />
+        <CopyButton value={hexadecimal} label={`Salin ${hexadecimal}`} variant="dark" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left 7 cols: Dynamic Nibble Breakdown for the Current Input */}
-        <div className="lg:col-span-7 rounded-xl bg-[#181C14] text-[#ECDFCC] p-4 sm:p-5 border border-[#3C3D37]">
-          <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="lg:col-span-7 rounded-xl bg-[#181C14] text-[#ECDFCC] p-5 sm:p-6 border border-[#3C3D37] shadow-sm">
+          <div className="flex items-center justify-between gap-3 mb-5 pb-3.5 border-b border-[#ECDFCC]/15">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#697565] block">
-                Current Conversion ({format.total_bits} Bits → {format.hex_digits} Nibbles)
+              <span className="text-xs font-mono uppercase tracking-wider text-[#697565] block font-semibold">
+                Konversi Berjalan ({format.total_bits} Bit → {format.hex_digits} Nibble)
               </span>
-              <h3 className="text-base font-bold">Dynamic 4-Bit Nibble Mapping</h3>
+              <h3 className="text-base sm:text-lg font-bold">Pemetaan Grup 4-Bit Dinamis</h3>
             </div>
-            <span className="font-mono text-lg font-bold text-[#ECDFCC] bg-[#697565] px-3 py-1 rounded">
+            <span className="font-mono text-xl sm:text-2xl font-bold text-[#ECDFCC] bg-[#697565] px-3.5 py-1.5 rounded-lg shadow-xs">
               {hexadecimal}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
             {step8_hex_rows.map((nibble) => (
               <div
                 key={`nibble-card-${nibble.group_index}`}
-                className="p-2.5 rounded-lg bg-[#3C3D37]/75 border border-[#ECDFCC]/15 flex flex-col justify-between"
+                className="p-3 rounded-lg bg-[#3C3D37]/75 border border-[#ECDFCC]/15 flex flex-col justify-between shadow-xs"
               >
-                <div className="flex items-center justify-between text-[10px] font-mono text-[#ECDFCC]/65">
-                  <span>Nibble #{nibble.group_index}</span>
+                <div className="flex items-center justify-between text-xs font-mono text-[#ECDFCC]/75">
+                  <span className="font-semibold">Nibble #{nibble.group_index}</span>
                   <span>{nibble.bit_range.replace('Bits ', 'b')}</span>
                 </div>
-                <div className="my-1.5 flex items-center justify-between font-mono">
-                  <span className="text-sm font-semibold text-[#ECDFCC]">{nibble.binary_group}₂</span>
+                <div className="my-2 flex items-center justify-between font-mono">
+                  <span className="text-sm sm:text-base font-bold text-[#ECDFCC]">{nibble.binary_group}₂</span>
                   <span className="text-xs text-[#ECDFCC]/50">→</span>
-                  <span className="w-7 h-7 rounded bg-[#ECDFCC] text-[#181C14] font-bold text-sm flex items-center justify-center">
+                  <span className="w-8 h-8 rounded-md bg-[#ECDFCC] text-[#181C14] font-bold text-base flex items-center justify-center shadow-xs">
                     {nibble.hex_digit}
                   </span>
                 </div>
-                <div className="text-[10px] text-[#ECDFCC]/70 truncate">{nibble.spanning_fields}</div>
+                <div className="text-xs text-[#ECDFCC]/75 truncate">{nibble.spanning_fields}</div>
               </div>
             ))}
           </div>
 
-          <div className="text-xs text-[#ECDFCC]/80 font-mono pt-3 border-t border-[#ECDFCC]/15 flex flex-wrap items-center justify-between gap-2">
+          <div className="text-xs sm:text-sm text-[#ECDFCC]/85 font-mono pt-3 border-t border-[#ECDFCC]/15 flex flex-wrap items-center justify-between gap-2">
             <span>
-              Concatenated Hex Digits: 0x
+              Digit Hex Rangkaian: 0x
               {step8_hex_rows.map((r) => r.hex_digit).join('')}
             </span>
-            <span>{format.total_bits / 4} × 4-bit groups</span>
+            <span>{format.total_bits / 4} × 4-bit grup</span>
           </div>
         </div>
 
         {/* Right 5 cols: Standard 4-Bit-to-Hexadecimal Reference Table (0..7 | 8..F) */}
-        <div className="lg:col-span-5 rounded-xl border border-[#181C14]/20 bg-[#ECDFCC] overflow-hidden">
-          <div className="bg-[#3C3D37] text-[#ECDFCC] px-4 py-3 flex items-center justify-between">
+        <div className="lg:col-span-5 rounded-xl border border-[#181C14]/20 bg-[#ECDFCC] overflow-hidden shadow-xs">
+          <div className="bg-[#3C3D37] text-[#ECDFCC] px-5 py-3.5 flex items-center justify-between">
             <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#ECDFCC]/75 block">
-                IEEE 754 Reference Table
+              <span className="text-xs font-mono uppercase tracking-wider text-[#ECDFCC]/75 block font-semibold">
+                Tabel Referensi Standar IEEE 754
               </span>
-              <h3 className="text-sm font-bold">4-Bit Binary to Hexadecimal Lookup</h3>
+              <h3 className="text-sm sm:text-base font-bold">Rujukan Biner 4-Bit ke Heksadesimal</h3>
             </div>
-            <span className="text-[11px] font-mono text-[#ECDFCC]/80">0000₂ – 1111₂</span>
+            <span className="text-xs font-mono text-[#ECDFCC]/85 font-bold">0000₂ – 1111₂</span>
           </div>
 
           <div className="overflow-x-auto">
             <table
-              className="w-full text-left border-collapse text-xs font-mono"
+              className="w-full text-left border-collapse text-sm font-mono"
               aria-label="4-bit binary to hexadecimal reference table"
             >
               <thead>
                 <tr className="bg-[#181C14] text-[#ECDFCC]">
-                  <th className="py-2.5 px-3 font-semibold text-center border-r border-[#ECDFCC]/15">
+                  <th className="py-2.5 px-3 font-bold text-center border-r border-[#ECDFCC]/15">
                     Hex
                   </th>
-                  <th className="py-2.5 px-3 font-semibold text-center border-r border-[#ECDFCC]/25">
-                    Binary
+                  <th className="py-2.5 px-3 font-bold text-center border-r border-[#ECDFCC]/25">
+                    Biner
                   </th>
-                  <th className="py-2.5 px-3 font-semibold text-center border-r border-[#ECDFCC]/15">
+                  <th className="py-2.5 px-3 font-bold text-center border-r border-[#ECDFCC]/15">
                     Hex
                   </th>
-                  <th className="py-2.5 px-3 font-semibold text-center">Binary</th>
+                  <th className="py-2.5 px-3 font-bold text-center">Biner</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#181C14]/15">
