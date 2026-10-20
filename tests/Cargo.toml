@@ -1,0 +1,12 @@
+[package]
+name = "ieee754-tests"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+ieee754-core.workspace = true
+serde_json.workspace = true

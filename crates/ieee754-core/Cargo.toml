@@ -1,0 +1,15 @@
+[package]
+name = "ieee754-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Core IEEE 754 binary32 and binary64 educational conversion engine"
+
+[lib]
+name = "ieee754_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
