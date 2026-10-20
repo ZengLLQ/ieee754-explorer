@@ -215,9 +215,9 @@ export const App: React.FC = () => {
             <span className="font-bold tracking-tight text-base sm:text-lg text-[#181C14]">
               IEEE 754 Explorer
             </span>
-            <span className="hidden md:inline-flex items-center gap-2 text-xs font-mono px-3 py-1 rounded-full bg-[#3C3D37] text-[#ECDFCC] border border-[#ECDFCC]/15">
+            <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium px-3 py-1 rounded-full bg-[#3C3D37] text-[#ECDFCC] border border-[#ECDFCC]/15 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-[#697565]" />
-              IEEE Std 754-2019
+              made by JAYCEE 曾令强
             </span>
           </div>
 
@@ -537,7 +537,7 @@ export const App: React.FC = () => {
               754
             </span>
             <span className="font-bold text-[#ECDFCC]">IEEE 754 Explorer</span>
-            <span className="text-[#ECDFCC]/75">— Interactive Floating-Point Conversion & Visual Step-by-Step Analysis</span>
+            <span className="text-[#ECDFCC]/75">— made by JAYCEE 曾令强</span>
           </div>
           <div className="font-mono text-xs sm:text-sm text-[#ECDFCC]/75">
             IEEE Std 754-2019 Specification • Single (binary32) & Double (binary64) Precision
